@@ -3,7 +3,7 @@
 #include <getopt.h>
 #include "Finder.h"
 
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 static char * stripPath(const char * path)
 {
