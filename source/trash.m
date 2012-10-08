@@ -91,7 +91,7 @@ int main(int argc, const char * argv[])
   for (i = optind; i < argc; i++)
   {
     NSString * argument = [NSString stringWithUTF8String:argv[i]];
-    NSURL * file = [[NSURL URLWithString:argument relativeToURL:cwd] absoluteURL];
+    NSURL * file = [[NSURL URLWithString:[argument stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] relativeToURL:cwd] absoluteURL];
     FinderItem * item = [finder.items objectAtLocation:file];
 
     if ([item exists])
