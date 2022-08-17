@@ -3,35 +3,31 @@
 #include <getopt.h>
 #include "Finder.h"
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
-static char * stripPath(const char * path)
-{
+static char * stripPath(const char * path) {
   char * name = strrchr(path, '/');
   return name ? ++name : (char *)path;
 }
 
-static void usage(char * programName)
-{
+static void usage(char * programName) {
   printf("Usage: %s [options] files...\n", programName);
   printf("\n");
   printf("Trash Options:\n");
-  printf("-e, --empty                      Empties the trash\n");
-  printf("-E, --empty-securely             Securely empties the trash\n");
-  printf("-l, --list                       Lists all files in the trash\n");
+  printf("-e, --empty                    Empties the trash\n");
+  printf("-E, --empty-securely           Securely empties the trash\n");
+  printf("-l, --list                     Lists all files in the trash\n");
   printf("\n");
   printf("General Options:\n");
-  printf("-h, --help                       Print this message and exit\n");
-  printf("-v, --version                    Print the version and exit\n");
+  printf("-h, --help                     Print this message and exit\n");
+  printf("-v, --version                  Print the version and exit\n");
 }
 
-static void version(char * programName)
-{
+static void version(char * programName) {
   printf("%s %s\n", programName, VERSION);
 }
 
-int main(int argc, const char * argv[])
-{
+int main(int argc, const char * argv[]) {
   FinderApplication * finder = [SBApplication applicationWithBundleIdentifier:@"com.apple.finder"];
   FinderTrashObject * trash = finder.trash;
   trash.warnsBeforeEmptying = NO;
@@ -48,10 +44,8 @@ int main(int argc, const char * argv[])
   };
   int i, option, optionIndex;
 
-  while ((option = getopt_long(argc, (char **)argv, shortOptions, longOptions, &optionIndex)) != -1)
-  {
-    switch (option)
-    {
+  while ((option = getopt_long(argc, (char **)argv, shortOptions, longOptions, &optionIndex)) != -1) {
+    switch (option) {
       case 'e':
         [trash emptySecurity:NO];
         exit(EXIT_SUCCESS);
@@ -82,24 +76,19 @@ int main(int argc, const char * argv[])
     }
   }
 
-  if (optind >= argc)
-  {
+  if (optind >= argc) {
     usage(programName);
     exit(EXIT_FAILURE);
   }
 
-  for (i = optind; i < argc; i++)
-  {
+  for (i = optind; i < argc; i++) {
     NSString * argument = [NSString stringWithUTF8String:argv[i]];
-    NSURL * file = [[NSURL URLWithString:[argument stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] relativeToURL:cwd] absoluteURL];
+    NSURL * file = [[NSURL URLWithString:[argument stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]] relativeToURL:cwd] absoluteURL];
     FinderItem * item = [finder.items objectAtLocation:file];
 
-    if ([item exists])
-    {
+    if ([item exists]) {
       [item delete];
-    }
-    else
-    {
+    } else {
       printf("%s: %s: No such file or directory\n", programName, [argument UTF8String]);
       exit(EXIT_FAILURE);
     }

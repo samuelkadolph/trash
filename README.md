@@ -10,8 +10,11 @@ trash behaviour: `Put Back` and name conflict resolution and you get that lovely
 
 ## Installation
 
-    git clone https://github.com/samuelkadolph/trash && cd trash
-    make install
+```
+git clone https://github.com/samuelkadolph/trash && cd trash
+make
+sudo make install
+```
 
 ## Usage
 

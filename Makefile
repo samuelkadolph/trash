@@ -1,8 +1,8 @@
-CC = gcc
-INSTALL = install
+CC ?= gcc
+INSTALL ?= install
 
-CFLAGS = -Wall -Werror -fno-common -pipe
-LDFLAGS = -framework Foundation -framework ScriptingBridge
+CFLAGS ?= -Wall -Werror -fno-common -pipe
+LDFLAGS ?= -framework Foundation -framework ScriptingBridge
 
 ifeq ($(DEBUG), 1)
 	BUILD = debug
@@ -12,34 +12,21 @@ else
 	CFLAGS += -O2 -g
 endif
 
-CFLAGS += -Ibuild/$(BUILD) -Lbuild/$(BUILD)
+default: clean build
 
-EXECUTABLE = trash
-SOURCES = trash.m
-OBJECTS = $(addprefix build/$(BUILD)/,$(SOURCES:.m=.o))
-DEPENDENCIES = $(addprefix build/$(BUILD)/,$(SOURCES:.m=.d))
+build: build/trash
 
-all: build/$(BUILD)/$(EXECUTABLE)
-
-build/$(BUILD):
-	mkdir -p $@
-
-build/$(BUILD)/%.d: source/%.m | build/$(BUILD)
-	$(CC) $(CFLAGS) $< -M -MF $@ -MT ${@:.d=.o} -MT $@
-
-build/$(BUILD)/%.o: source/%.m | build/$(BUILD)
+build/%.o: source/%.m
 	$(CC) $(CFLAGS) -c $< -o $@
 
-build/$(BUILD)/$(EXECUTABLE): $(OBJECTS) | build/$(BUILD)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o $@
+build/trash: build/trash.o
+	$(CC) $(CFLAGS) $(LDFLAGS) build/trash.o -o $@
 
 clean:
-	rm -rf build
+	rm -rf build/*
+.PHONY: clean
 
-install: build/$(BUILD)/$(EXECUTABLE)
+install: build/trash
 	$(INSTALL) -d /usr/local/bin
-	$(INSTALL) -m 755 build/$(BUILD)/$(EXECUTABLE) /usr/local/bin
-
-.PHONY: all clean install
-
--include $(DEPENDENCIES)
+	$(INSTALL) -m 755 build/trash /usr/local/bin
+.PHONY: install
